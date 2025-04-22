@@ -5,10 +5,11 @@ import { toast } from "sonner";
 import { CardContent, CardFooter } from "./ui/card";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
-import { useState } from "react";
+import { startTransition, useState } from "react";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
 import Link from "next/link"; // Pour la redirection
+import { title } from "process";
 
 type Props = {
   type: "login" | "SignUp";
@@ -21,18 +22,53 @@ function AuthForm({ type }: Props) {
   const [isPending, setIsPending] = useState(false);
 
   const handleSubmit = async (formData: FormData) => {
-    setIsPending(true);
+  //   setIsPending(true);
 
-    console.log("form submitted");
+  //   console.log("form submitted");
 
-    // Simuler délai
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+  //   // Simuler délai
+  //   await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    toast.success("Form submitted successfully");
+  //   toast.success("Form submitted successfully");
 
-    setIsPending(false);
-    router.push("/");
-  };
+  //   setIsPending(false);
+  //   router.push("/");
+
+   startTransition( async ( )=>{
+     const email = formData.get("email") as string ;
+     const password = formData.get("password ") as string ;
+     let errorMessage ;
+     let title ;
+     let description ;
+     if (isLoginForm){
+      errorMessage = ( await loginAction(email,password)).errorMessage;
+      title = "logged in";
+      description = " You have been successfully logged in";
+    
+     } else{
+      errorMessage =( await signUpAction(email,password)).errorMessage;
+      title = "signed Up";
+      description = "check your email for a confiormation link";
+
+     }
+     if (!errorMessage){
+      toast({
+        title,
+        description ,
+        variant : "succes",
+      });
+      router.replace ("/");
+
+     }else {
+      toast({
+        title : "error",
+        descrition : errorMessage,
+        variant : "description",
+      }); 
+     }
+
+   })
+   };
 
   return (
     <form action={handleSubmit}>
@@ -96,3 +132,11 @@ function AuthForm({ type }: Props) {
 }
 
 export default AuthForm;
+function signUpAction(email: string, password: string) {
+  throw new Error("Function not implemented.");
+}
+
+function loginAction(email: string, password: string) {
+  throw new Error("Function not implemented.");
+}
+
